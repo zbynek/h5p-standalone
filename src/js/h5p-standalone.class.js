@@ -69,12 +69,14 @@ export default class H5PStandalone {
       styles: styles,
       scripts: scripts,
       displayOptions: displayOptions,
-      contentUrl: urlPath(`${this.path}/content`)
+      contentUrl: urlPath(`${this.path}/content`),
+      metadata: this.h5p
     };
 
     // if (!preventH5PInit) {
     H5P.init();
     // }
+    return this;
   }
 
   getJSON(url) {
@@ -214,10 +216,16 @@ export default class H5PStandalone {
     });
 
     if (this.mainLibrary.preloadedCss) {
-      Array.prototype.push.apply(styles, this.mainLibrary.preloadedCss.map(style => `${this.librariesPath}/${this.mainLibraryPath}/${style.path}`));
+      $.each(this.mainLibrary.preloadedCss, (i, style) => {
+        const stylePath = `${this.librariesPath}/${this.mainLibraryPath}/${style.path}`
+        if($.inArray(stylePath, styles) === -1) styles.push(stylePath);
+      });
     }
     if (this.mainLibrary.preloadedJs) {
-      Array.prototype.push.apply(scripts, this.mainLibrary.preloadedJs.map(script => `${this.librariesPath}/${this.mainLibraryPath}/${script.path}`));
+      $.each(this.mainLibrary.preloadedJs, (i, script) => {
+        const scriptPath = `${this.librariesPath}/${this.mainLibraryPath}/${script.path}`
+        if($.inArray(scriptPath, scripts) === -1) scripts.push(scriptPath);
+      });
     }
     return { styles, scripts };
   }
